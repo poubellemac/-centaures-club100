@@ -230,13 +230,28 @@
 
   window.addEventListener('DOMContentLoaded', async () => {
     sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    const saved = localStorage.getItem(EV_KEY);
-    if (saved) { try { ev = { ...ev, ...JSON.parse(saved) }; } catch(e) {} }
+    await loadParametres();
     applyEvent();
     await loadParticipants();
     document.getElementById('statusMsg').textContent = '✅ Données synchronisées en temps réel.';
     setInterval(loadParticipants, 30000);
   });
+
+  async function loadParametres() {
+    if (!sb) return;
+    const { data, error } = await sb.from('parametres').select('*').eq('id', 1).single();
+    if (error || !data) return;
+    ev = {
+      titre: data.titre || ev.titre,
+      tagline: data.tagline || ev.tagline,
+      date: data.date_affichee || ev.date,
+      lieu: data.lieu_nom || ev.lieu,
+      adresse: data.lieu_adresse || ev.adresse,
+      description: data.description || ev.description,
+      prix: data.prix_conditions || ev.prix,
+      actif: data.inscriptions_ouvertes !== null ? data.inscriptions_ouvertes : ev.actif
+    };
+  }
 
   function applyEvent() {
     document.getElementById('evTitre').textContent = ev.titre;
@@ -342,7 +357,7 @@
     document.getElementById('adminPrix').value = ev.prix;
     document.getElementById('evActif').checked = ev.actif;
   }
-  function saveEvent() {
+  async function saveEvent() {
     ev = {
       titre: document.getElementById('adminTitre').value.trim() || ev.titre,
       tagline: document.getElementById('adminTagline').value.trim(),
@@ -353,7 +368,18 @@
       prix: document.getElementById('adminPrix').value.trim(),
       actif: document.getElementById('evActif').checked
     };
-    localStorage.setItem(EV_KEY, JSON.stringify(ev));
+    const { error } = await sb.from('parametres').upsert({
+      id: 1,
+      titre: ev.titre,
+      tagline: ev.tagline,
+      date_affichee: ev.date,
+      lieu_nom: ev.lieu,
+      lieu_adresse: ev.adresse,
+      description: ev.description,
+      prix_conditions: ev.prix,
+      inscriptions_ouvertes: ev.actif
+    });
+    if (error) { alert('Erreur sauvegarde : ' + error.message); return; }
     applyEvent(); showToast('✅ Événement enregistré !');
   }
   function renderAdminList() {
