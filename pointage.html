@@ -113,7 +113,18 @@
     <div class="top-bar-stats">
       <div class="stat-pill present" id="statPresent">0 présents</div>
       <div class="stat-pill paye" id="statPaye">0 payés</div>
+      <button onclick="showAddPanel()" style="background:var(--or);color:var(--noir);border:none;border-radius:8px;padding:6px 12px;font-weight:700;font-size:14px;cursor:pointer;">➕</button>
     </div>
+  </div>
+
+  <!-- PANNEAU AJOUT -->
+  <div id="addPanel" style="display:none;padding:0.75rem 1rem;background:var(--noir-soft);border-bottom:1px solid var(--border-strong);">
+    <div style="display:flex;gap:8px;align-items:center;">
+      <input type="text" id="addNomInput" placeholder="Nom et prénom" style="flex:1;padding:10px 14px;font-size:15px;font-family:'Lato',sans-serif;border:1px solid var(--border);border-radius:10px;background:var(--noir);color:var(--blanc);outline:none;" />
+      <button onclick="addPersonne()" style="padding:10px 16px;background:var(--or);color:var(--noir);border:none;border-radius:10px;font-weight:700;font-size:14px;cursor:pointer;">OK</button>
+      <button onclick="hideAddPanel()" style="padding:10px 12px;background:transparent;color:var(--or-light);border:1px solid var(--border);border-radius:10px;font-size:14px;cursor:pointer;">✕</button>
+    </div>
+    <div id="addError" style="display:none;font-size:13px;color:#E57373;margin-top:6px;"></div>
   </div>
 
   <div class="search-bar">
@@ -250,10 +261,15 @@
       else if (isAbsent) statusBadge = '<span style="font-size:11px;color:var(--red);font-weight:700;">❌ Absent</span>';
       else statusBadge = '<span style="font-size:11px;color:var(--or-light);opacity:0.4;">⏳ Non pointé</span>';
 
+      const corbeille = p.manuel ? `<button onclick="deletePersonne(${p.id}, '${esc(p.nom)}')" style="background:transparent;border:none;cursor:pointer;font-size:16px;opacity:0.4;padding:2px 4px;" title="Supprimer">🗑️</button>` : '';
+
       return `<div class="person-card">
         <div class="person-top">
           <div class="person-name">${esc(p.nom)}</div>
-          ${statusBadge}
+          <div style="display:flex;align-items:center;gap:8px;">
+            ${statusBadge}
+            ${corbeille}
+          </div>
         </div>
         ${comment}
         <div class="person-actions">
@@ -282,6 +298,40 @@
     const t = document.getElementById('toast');
     t.textContent = msg; t.classList.add('show');
     setTimeout(() => t.classList.remove('show'), 2000);
+  }
+
+  function showAddPanel() {
+    document.getElementById('addPanel').style.display = 'block';
+    document.getElementById('addNomInput').focus();
+    document.getElementById('addError').style.display = 'none';
+    document.getElementById('addNomInput').value = '';
+  }
+  function hideAddPanel() {
+    document.getElementById('addPanel').style.display = 'none';
+  }
+
+  async function addPersonne() {
+    const nom = document.getElementById('addNomInput').value.trim();
+    const errEl = document.getElementById('addError');
+    errEl.style.display = 'none';
+    if (!nom) { errEl.textContent = 'Merci de saisir un nom.'; errEl.style.display = 'block'; return; }
+    const doublon = participants.find(p => p.nom.toLowerCase() === nom.toLowerCase());
+    if (doublon) { errEl.textContent = '"' + nom + '" est déjà dans la liste.'; errEl.style.display = 'block'; return; }
+    const { error } = await sb.from('inscriptions').insert([{ nom, presence: true, manuel: true, created_at: new Date().toISOString() }]);
+    if (error) { errEl.textContent = 'Erreur : ' + error.message; errEl.style.display = 'block'; return; }
+    hideAddPanel();
+    await loadData();
+    showToast('✅ ' + nom + ' ajouté !');
+  }
+
+  async function deletePersonne(id, nom) {
+    if (!confirm('Supprimer "' + nom + '" de la liste ?')) return;
+    const { error } = await sb.from('inscriptions').delete().eq('id', id);
+    if (error) { showToast('❌ Erreur suppression'); return; }
+    delete pointage[id];
+    savePointageLocal();
+    await loadData();
+    showToast('🗑️ ' + nom + ' supprimé');
   }
 
   function esc(str) {
