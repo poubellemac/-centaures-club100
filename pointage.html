@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
@@ -114,6 +115,7 @@
       <div class="stat-pill present" id="statPresent">0 présents</div>
       <div class="stat-pill paye" id="statPaye">0 payés</div>
       <button onclick="showAddPanel()" style="background:var(--or);color:var(--noir);border:none;border-radius:8px;padding:6px 12px;font-weight:700;font-size:14px;cursor:pointer;">➕</button>
+      <button onclick="exportMail()" style="background:transparent;color:var(--or);border:1px solid var(--border);border-radius:8px;padding:6px 12px;font-weight:700;font-size:14px;cursor:pointer;">📧</button>
     </div>
   </div>
 
@@ -151,6 +153,9 @@
   const SUPABASE_KEY = "sb_publishable_jBYPHmCnJe_6xx60wBZjgw_AEFgw4GU";
   const ADMIN_PWD   = "admin";
   const POINTAGE_KEY = "club100_pointage";
+  const EJS_PUBLIC  = "JMg0VaPvHEtJPKJHY";
+  const EJS_SERVICE = "service_2p4k28";
+  const EJS_TEMPLATE= "template_87zbs1w";
 
   let sb = null;
   let participants = [];
@@ -175,9 +180,41 @@
   // ─── INIT ────────────────────────────────────────────────
   async function init() {
     sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    emailjs.init(EJS_PUBLIC);
     loadPointageLocal();
     await loadData();
     setInterval(loadData, 30000);
+  }
+
+  async function exportMail() {
+    if (!confirm('Envoyer le pointage par mail à poubellemac@free.fr ?')) return;
+    showToast('📧 Envoi en cours...');
+
+    const date = new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+    const nbPresent = participants.filter(p => pointage[p.id]?.present === true).length;
+    const nbPaye    = participants.filter(p => pointage[p.id]?.paye === true).length;
+
+    let texte = `POINTAGE CLUB 100 — ${date}\n`;
+    texte += `${'='.repeat(40)}\n`;
+    texte += `Présents : ${nbPresent} / ${participants.length}\n`;
+    texte += `Payés    : ${nbPaye}\n`;
+    texte += `${'='.repeat(40)}\n\n`;
+
+    const tries = participants.slice().sort((a,b) => a.nom.localeCompare(b.nom));
+    tries.forEach(p => {
+      const pt = pointage[p.id] || {};
+      const present = pt.present === true ? '✅' : pt.present === false ? '❌' : '⏳';
+      const paye = pt.paye ? '💰' : '  ';
+      texte += `${present} ${paye}  ${p.nom}\n`;
+    });
+
+    try {
+      await emailjs.send(EJS_SERVICE, EJS_TEMPLATE, { liste: texte });
+      showToast('✅ Mail envoyé !');
+    } catch(e) {
+      showToast('❌ Erreur envoi mail');
+      console.error(e);
+    }
   }
 
   function loadPointageLocal() {
