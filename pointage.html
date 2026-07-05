@@ -34,10 +34,13 @@
     display: flex; align-items: center; justify-content: space-between;
   }
   .top-bar-title { font-family: 'Playfair Display', serif; color: var(--or); font-size: 1.1rem; }
-  .top-bar-stats { display: flex; gap: 8px; align-items: center; }
-  .stat-pill { font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 20px; }
-  .stat-pill.present { background: var(--green-light); color: var(--green-dark); }
-  .stat-pill.paye    { background: var(--blue-light); color: var(--blue-dark); }
+  .top-bar-stats { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+  .stat-pill { font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 20px; white-space: nowrap; }
+  .stat-pill.present   { background: var(--green-light); color: var(--green-dark); }
+  .stat-pill.absent    { background: var(--red-light);   color: var(--red-dark); }
+  .stat-pill.nonpointe { background: var(--gris);        color: var(--or-light); }
+  .stat-pill.somme     { background: var(--or);          color: var(--noir); }
+  .stat-pill.paye      { background: var(--blue-light);  color: var(--blue-dark); }
 
   .filters { display: flex; gap: 8px; padding: 0.75rem 1rem; overflow-x: auto; border-bottom: 1px solid var(--border); background: var(--noir); }
   .filter-btn { flex-shrink: 0; padding: 6px 14px; border-radius: 20px; border: 1px solid var(--border); background: transparent; color: var(--or-light); font-size: 13px; font-weight: 700; font-family: 'Lato', sans-serif; cursor: pointer; white-space: nowrap; transition: all 0.15s; }
@@ -56,14 +59,14 @@
     transition: background 0.15s;
   }
   .person-card:active { background: rgba(201,168,76,0.05); }
-  .person-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.6rem; }
-  .person-name { font-size: 17px; font-weight: 700; color: var(--blanc); }
-  .person-comment { font-size: 12px; color: var(--or-light); opacity: 0.6; font-style: italic; margin-bottom: 0.6rem; }
-  .person-actions { display: flex; gap: 8px; }
+  .person-line { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .person-name { font-size: 16px; font-weight: 700; color: var(--blanc); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .person-comment { font-size: 12px; color: var(--or-light); opacity: 0.6; font-style: italic; margin-top: 0.4rem; }
+  .person-actions { display: flex; gap: 6px; flex-shrink: 0; }
   .action-btn {
-    flex: 1; padding: 10px 6px; border-radius: 10px; border: 1px solid var(--border);
+    width: 42px; padding: 9px 0; border-radius: 10px; border: 1px solid var(--border);
     background: var(--noir-soft); color: var(--blanc);
-    font-size: 13px; font-weight: 700; font-family: 'Lato', sans-serif;
+    font-size: 15px; font-weight: 700; font-family: 'Lato', sans-serif;
     cursor: pointer; transition: all 0.15s; text-align: center;
   }
   .action-btn.active-present { background: var(--green-light); border-color: var(--green); color: var(--green-dark); }
@@ -107,9 +110,10 @@
     </div>
     <div class="top-bar-stats">
       <div class="stat-pill present" id="statPresent">0 présents</div>
-      <div class="stat-pill paye" id="statPaye">0 payés</div>
+      <div class="stat-pill absent" id="statAbsent">0 absents</div>
+      <div class="stat-pill nonpointe" id="statNonPointe">0 non pointés</div>
+      <div class="stat-pill somme" id="statSomme">0 €</div>
       <button onclick="showAddPanel()" style="background:var(--or);color:var(--noir);border:none;border-radius:8px;padding:6px 12px;font-weight:700;font-size:14px;cursor:pointer;">➕</button>
-
     </div>
   </div>
 
@@ -161,6 +165,7 @@
   let participants = [];
   let pointage = {}; // { id: { present: bool|null, paye: bool|null } }
   let currentFilter = 'tous';
+  let prixEvent = 30; // chargé depuis parametres.prix_num
 
   // ─── INIT ────────────────────────────────────────────────
   window.addEventListener('DOMContentLoaded', () => init());
@@ -207,9 +212,12 @@
 
   async function loadData() {
     setSyncing(true);
+    // Prix event (pour la somme globale)
+    const { data: param } = await sb.from('parametres').select('prix_num').eq('id', 1).single();
+    if (param && param.prix_num != null) prixEvent = Number(param.prix_num) || 0;
     const { data, error } = await sb.from('inscriptions').select('*').order('nom', { ascending: true });
     setSyncing(false);
-    if (error) { showToast('❌ Erreur de connexion'); return; }
+    if (error) { return; }
     // Ne garder que les inscrits "Je viens"
     participants = (data || []).filter(p => p.presence === true);
     renderList();
@@ -292,40 +300,37 @@
       const isPaye    = !!pt.paye;
       const comment = p.commentaire ? '<div class="person-comment">💬 ' + esc(p.commentaire) + '</div>' : '';
 
-      let statusBadge = '';
-      if (isPresent) statusBadge = '<span style="font-size:11px;color:var(--green);font-weight:700;">✅ Présent</span>';
-      else if (isAbsent) statusBadge = '<span style="font-size:11px;color:var(--red);font-weight:700;">❌ Absent</span>';
-      else statusBadge = '<span style="font-size:11px;color:var(--or-light);opacity:0.4;">⏳ Non pointé</span>';
-
       const modePaye = pt.paye || '';            // '' = pas payé, sinon 'Espèces'/'Virement'/'Chèque'/'Nature'
       const estPaye  = modePaye && modePaye !== 'Pas payé';
       const labelPaye = estPaye ? ('💰 ' + modePaye) : '💸 Pas payé';
       const corbeille = p.manuel ? `<button onclick="deletePersonne(${p.id}, '${esc(p.nom)}')" style="background:transparent;border:none;cursor:pointer;font-size:16px;opacity:0.4;padding:2px 4px;" title="Supprimer">🗑️</button>` : '';
 
       return `<div class="person-card">
-        <div class="person-top">
+        <div class="person-line">
           <div class="person-name">${esc(p.nom)}</div>
-          <div style="display:flex;align-items:center;gap:8px;">
-            ${statusBadge}
+          <div class="person-actions">
+            <button class="action-btn ${isPresent ? 'active-present' : ''}" onclick="togglePresent(${p.id})" title="Présent">✅</button>
+            <button class="action-btn ${isAbsent  ? 'active-absent'  : ''}" onclick="toggleAbsent(${p.id})" title="Absent">❌</button>
+            <button class="action-btn ${estPaye ? 'active-paye' : 'active-impaye'}" onclick="ouvrirMenuPaiement(${p.id})" title="${estPaye ? modePaye : 'Pas payé'}">💰</button>
             ${corbeille}
           </div>
         </div>
         ${comment}
-        <div class="person-actions">
-          <button class="action-btn ${isPresent ? 'active-present' : ''}" onclick="togglePresent(${p.id})">✅ Présent</button>
-          <button class="action-btn ${isAbsent  ? 'active-absent'  : ''}" onclick="toggleAbsent(${p.id})">❌ Absent</button>
-          <button class="action-btn ${estPaye ? 'active-paye' : 'active-impaye'}" onclick="ouvrirMenuPaiement(${p.id})">${labelPaye}</button>
-        </div>
       </div>`;
     }).join('');
   }
 
   function updateStats() {
     const inscrits = participants;
-    const nbPresent = inscrits.filter(p => pointage[p.id]?.present === true).length;
-    const nbPaye    = inscrits.filter(p => { const v = pointage[p.id]?.paye; return v && v !== 'Pas payé'; }).length;
-    document.getElementById('statPresent').textContent = nbPresent + ' présent' + (nbPresent > 1 ? 's' : '');
-    document.getElementById('statPaye').textContent    = nbPaye    + ' payé' + (nbPaye > 1 ? 's' : '');
+    const nbPresent   = inscrits.filter(p => pointage[p.id]?.present === true).length;
+    const nbAbsent    = inscrits.filter(p => pointage[p.id]?.present === false).length;
+    const nbNonPointe = inscrits.filter(p => pointage[p.id]?.present == null).length;
+    const nbPaye      = inscrits.filter(p => { const v = pointage[p.id]?.paye; return v && v !== 'Pas payé'; }).length;
+    const somme       = nbPaye * prixEvent;
+    document.getElementById('statPresent').textContent   = nbPresent   + ' présent'   + (nbPresent > 1 ? 's' : '');
+    document.getElementById('statAbsent').textContent    = nbAbsent    + ' absent'    + (nbAbsent > 1 ? 's' : '');
+    document.getElementById('statNonPointe').textContent = nbNonPointe + ' non pointé' + (nbNonPointe > 1 ? 's' : '');
+    document.getElementById('statSomme').textContent     = somme.toLocaleString('fr-FR') + ' €';
   }
 
   function setSyncing(val) {
@@ -334,9 +339,7 @@
   }
 
   function showToast(msg) {
-    const t = document.getElementById('toast');
-    t.textContent = msg; t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 2000);
+    // Popups désactivés à la demande — plus aucune notification en bas.
   }
 
   function showAddPanel() {
