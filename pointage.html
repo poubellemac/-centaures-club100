@@ -326,7 +326,9 @@
     const nbAbsent    = inscrits.filter(p => pointage[p.id]?.present === false).length;
     const nbNonPointe = inscrits.filter(p => pointage[p.id]?.present == null).length;
     const nbPaye      = inscrits.filter(p => { const v = pointage[p.id]?.paye; return v && v !== 'Pas payé'; }).length;
-    const somme       = nbPaye * prixEvent;
+    // Somme en € : on compte les paiements réels (Espèces/Virement/Chèque), PAS "Nature" (échange sans argent)
+    const nbEnEuros   = inscrits.filter(p => { const v = pointage[p.id]?.paye; return v && v !== 'Pas payé' && v !== 'Nature'; }).length;
+    const somme       = nbEnEuros * prixEvent;
     document.getElementById('statPresent').textContent   = nbPresent   + ' présent'   + (nbPresent > 1 ? 's' : '');
     document.getElementById('statAbsent').textContent    = nbAbsent    + ' absent'    + (nbAbsent > 1 ? 's' : '');
     document.getElementById('statNonPointe').textContent = nbNonPointe + ' non pointé' + (nbNonPointe > 1 ? 's' : '');
