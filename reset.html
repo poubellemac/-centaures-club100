@@ -6,7 +6,6 @@
 <title>Reset — Club 100</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
@@ -43,7 +42,7 @@
   <input type="password" id="pwdInput" placeholder="Mot de passe" />
   <div class="error" id="loginError">Mot de passe incorrect.</div>
   <button class="btn btn-or" onclick="checkLogin()">Entrer</button>
-  <a href="index.html"><button class="btn btn-back">← Retour au site</button></a>
+  <a href="admin.html"><button class="btn btn-back">← Retour</button></a>
 </div>
 
 <!-- RESET PANEL -->
@@ -54,21 +53,17 @@
   <div class="label">personnes inscrites</div>
   <button class="btn btn-danger" onclick="doReset()">Supprimer toutes les inscriptions</button>
   <div class="success" id="successMsg">✅ Inscriptions supprimées !</div>
-  <a href="index.html"><button class="btn btn-back" style="margin-top:1.5rem;">← Retour au site</button></a>
+  <a href="inscriptions_event.html"><button class="btn btn-back" style="margin-top:1.5rem;">← Retour au site</button></a>
 </div>
 
 <script>
   const SUPABASE_URL = "https://uzvkaecogqzipyfzwclw.supabase.co";
   const SUPABASE_KEY = "sb_publishable_jBYPHmCnJe_6xx60wBZjgw_AEFgw4GU";
   const ADMIN_PWD   = "admin";
-  const EJS_PUBLIC  = "JMg0VaPvHEtJPKJHY";
-  const EJS_SERVICE = "service_2jxbi28";
-  const EJS_TEMPLATE= "template_87zbs1w";
   let sb = null;
 
   window.addEventListener('DOMContentLoaded', () => {
     sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    emailjs.init(EJS_PUBLIC);
     document.getElementById('pwdInput').addEventListener('keydown', e => {
       if (e.key === 'Enter') checkLogin();
     });
@@ -91,47 +86,20 @@
 
   async function doReset() {
     const btn = document.querySelector('.btn-danger');
-    btn.disabled = true;
-    btn.textContent = '📧 Envoi du mail...';
 
-    // 1. Récupérer toutes les inscriptions
-    const { data } = await sb.from('inscriptions').select('*').order('nom', { ascending: true });
-    const inscrits = data || [];
-
-    // 2. Construire le texte
-    const date = new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
-    let texte = `ARCHIVE INSCRIPTIONS CLUB 100 — ${date}\n`;
-    texte += `${'='.repeat(40)}\n`;
-    texte += `Total : ${inscrits.length} personne(s)\n`;
-    texte += `Présents : ${inscrits.filter(p => p.presence).length}\n`;
-    texte += `${'='.repeat(40)}\n\n`;
-    inscrits.forEach(p => {
-      const presence = p.presence ? '✅ Vient' : '❌ Ne vient pas';
-      texte += `${presence}  —  ${p.nom}`;
-      if (p.commentaire) texte += `  (${p.commentaire})`;
-      texte += '\n';
-    });
-
-    // 3. Envoyer le mail
-    try {
-      await emailjs.send(EJS_SERVICE, EJS_TEMPLATE, { liste: texte });
-    } catch(e) {
-      console.error('Erreur mail:', e);
-    }
-
-    // 4. Confirmation avant suppression
-    btn.textContent = '🗑 Suppression...';
+    // Confirmation avant suppression
     if (!confirm('Supprimer maintenant toutes les inscriptions ?')) {
-      btn.disabled = false;
-      btn.textContent = 'Supprimer toutes les inscriptions';
       return;
     }
 
+    btn.disabled = true;
+    btn.textContent = '🗑 Suppression...';
+
     const { error } = await sb.from('inscriptions').delete().neq('id', 0);
-    if (error) { alert('Erreur suppression : ' + error.message); btn.disabled = false; return; }
+    if (error) { alert('Erreur suppression : ' + error.message); btn.disabled = false; btn.textContent = 'Supprimer toutes les inscriptions'; return; }
 
     document.getElementById('countDisplay').textContent = '0';
-    document.getElementById('successMsg').textContent = '✅ Mail envoyé + inscriptions supprimées !';
+    document.getElementById('successMsg').textContent = '✅ Inscriptions supprimées !';
     document.getElementById('successMsg').style.display = 'block';
     btn.style.display = 'none';
   }

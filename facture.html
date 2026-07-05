@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Factures — Club 100 Reims en Champagne</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
 <style>
   :root {
     --or: #C9A84C;
@@ -23,7 +23,7 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
-    font-family: 'Montserrat', sans-serif;
+    font-family: 'Lato', sans-serif;
     background: var(--noir);
     color: var(--blanc);
     min-height: 100vh;
@@ -38,7 +38,7 @@
     text-align: center;
   }
   header h1 {
-    font-family: 'Cormorant Garamond', serif;
+    font-family: 'Playfair Display', serif, serif;
     font-size: 22px;
     font-weight: 700;
     color: var(--or);
@@ -64,7 +64,7 @@
     background: none;
     border: none;
     color: var(--gris-moyen);
-    font-family: 'Montserrat', sans-serif;
+    font-family: 'Lato', sans-serif;
     font-size: 11px;
     font-weight: 500;
     letter-spacing: 1px;
@@ -92,7 +92,7 @@
     margin-bottom: 16px;
   }
   .card-title {
-    font-family: 'Cormorant Garamond', serif;
+    font-family: 'Playfair Display', serif, serif;
     font-size: 16px;
     color: var(--or);
     font-weight: 600;
@@ -121,7 +121,7 @@
     border-radius: 6px;
     padding: 12px 14px;
     color: var(--blanc);
-    font-family: 'Montserrat', sans-serif;
+    font-family: 'Lato', sans-serif;
     font-size: 14px;
     transition: border-color 0.2s;
     -webkit-appearance: none;
@@ -137,7 +137,7 @@
 
   .montant-display {
     text-align: center;
-    font-family: 'Cormorant Garamond', serif;
+    font-family: 'Playfair Display', serif, serif;
     font-size: 36px;
     color: var(--or);
     font-weight: 700;
@@ -151,7 +151,7 @@
     padding: 16px;
     border: none;
     border-radius: 8px;
-    font-family: 'Montserrat', sans-serif;
+    font-family: 'Lato', sans-serif;
     font-size: 13px;
     font-weight: 600;
     letter-spacing: 1px;
@@ -190,7 +190,7 @@
     margin-bottom: 16px;
   }
   .numero-badge .label { font-size: 10px; color: var(--gris-moyen); letter-spacing: 1px; margin-bottom: 4px; }
-  .numero-badge .numero { font-family: 'Cormorant Garamond', serif; font-size: 28px; color: var(--or); font-weight: 700; }
+  .numero-badge .numero { font-family: 'Playfair Display', serif, serif; font-size: 28px; color: var(--or); font-weight: 700; }
 
   /* ── TOAST ── */
   #toast {
@@ -230,13 +230,13 @@
     align-items: flex-start;
   }
   .facture-item .fi-num {
-    font-family: 'Cormorant Garamond', serif;
+    font-family: 'Playfair Display', serif, serif;
     font-size: 16px;
     color: var(--or);
     font-weight: 700;
   }
   .facture-item .fi-montant {
-    font-family: 'Cormorant Garamond', serif;
+    font-family: 'Playfair Display', serif, serif;
     font-size: 20px;
     color: var(--blanc);
     font-weight: 700;
@@ -263,7 +263,7 @@
     padding: 40px 20px;
   }
   #admin-lock h2 {
-    font-family: 'Cormorant Garamond', serif;
+    font-family: 'Playfair Display', serif, serif;
     color: var(--or);
     font-size: 22px;
     margin-bottom: 20px;
@@ -291,7 +291,7 @@
     text-align: center;
   }
   .stat-card .val {
-    font-family: 'Cormorant Garamond', serif;
+    font-family: 'Playfair Display', serif, serif;
     font-size: 28px;
     color: var(--or);
     font-weight: 700;
@@ -337,7 +337,7 @@
     text-align: center;
   }
   .modal-box h3 {
-    font-family: 'Cormorant Garamond', serif;
+    font-family: 'Playfair Display', serif, serif;
     font-size: 20px;
     color: var(--or);
     margin-bottom: 12px;
@@ -364,7 +364,7 @@
 
 <nav>
   <button class="active" onclick="showTab('nouvelle')">✦ Nouvelle</button>
-  <button onclick="showTab('admin')">⚙ Admin</button>
+  <button onclick="window.location.href='admin.html'">← Retour</button>
 </nav>
 
 <!-- ══════════════════════════════════════
@@ -425,7 +425,7 @@
   </div>
 
   <button class="btn btn-or" onclick="confirmerFacture()">
-    ✦ Générer la facture PDF
+    ✦ Générer la facture
   </button>
 
 </section>
@@ -525,7 +525,7 @@
     <p style="font-size:11px;color:#888;margin-bottom:16px;">
       ⚠️ Cette facture ne constitue un justificatif valable qu'après réception effective du règlement par l'association.
     </p>
-    <button class="btn btn-or" onclick="validerEtGenerer()">✦ Confirmer et télécharger le PDF</button>
+    <button class="btn btn-or" onclick="validerEtGenerer()">✦ Confirmer</button>
     <button class="btn btn-outline" style="margin-top:8px;" onclick="closeModal()">Annuler</button>
   </div>
 </div>
@@ -541,17 +541,13 @@ const SUPABASE_URL  = 'https://uzvkaecogqzipyfzwclw.supabase.co';
 const SUPABASE_KEY  = 'sb_publishable_jBYPHmCnJe_6xx60wBZjgw_AEFgw4GU';
 const ADMIN_PWD     = 'admin';
 
-const EMAILJS_PUBLIC_KEY  = 'JMg0VaPvHEtJPKJHY';
-const EMAILJS_SERVICE_ID  = 'service_2jxbi28';
-const EMAILJS_TEMPLATE_ID = 'template_87zbs1w'; // à adapter si nouveau template créé
-
 const ASSO = {
   nom:     'Club 100 Reims en Champagne',
   adresse: 'Chez HI Studio Photo – Bâtiment C1',
   cp:      'Allée Alberto Santos Dumont – 51100 Reims',
   rna:     'W513008995',
   rib:     'FR76 1020 6000 0198 7559 9124 403',
-  mail:    'poubellemac@free.fr',
+  mail:    'club100reims@gmail.com',
   tva:     'TVA non applicable, art. 293 B du CGI',
   statut:  'Association loi 1901 – But non lucratif'
 };
@@ -568,10 +564,6 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('date-prestation').value = today.toISOString().split('T')[0];
   // Charger le prochain numéro
   chargerProchainNumero();
-  // EmailJS
-  if (typeof emailjs !== 'undefined') {
-    emailjs.init(EMAILJS_PUBLIC_KEY);
-  }
 });
 
 // ══════════════════════════════════════════════════════
@@ -878,64 +870,88 @@ async function validerEtGenerer() {
   closeModal();
   const d = currentFactureData;
 
-  // 1. Générer PDF et télécharger
-  try {
-    const doc = genererPDF(d);
-    doc.save(`Facture_${d.numero}_${d.nom}.pdf`);
-    toast('✓ PDF téléchargé !', 'success');
-  } catch(e) {
-    toast('⚠ Erreur génération PDF', 'error');
-    console.error(e);
-    return;
-  }
+  const EJS_PUB = "x9cMeFn-4R6EbOHdS";
+  const EJS_SVC = "service_eh2k91k";
 
-  // 2. Sauvegarder dans Supabase
+  // 1. Sauvegarder dans Supabase — statut paye (admin a deja le paiement)
+  //    Numéro unique : si collision (contrainte UNIQUE), on régénère et on réessaie.
+  let numeroFinal = d.numero;
+  let enregistre = false;
   try {
-    await fetch(`${SUPABASE_URL}/rest/v1/factures`, {
-      method: 'POST',
-      headers: { ...supaHeaders(), 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
-      body: JSON.stringify({
-        numero:          d.numero,
-        prenom:          d.prenom,
-        nom:             d.nom,
-        mail:            d.mail,
-        adresse:         d.adresse,
-        type_prestation: d.type,
-        description:     d.description,
-        date_prestation: d.date_prestation,
-        montant:         d.montant,
-        paiement:        d.paiement,
-        ref_interne:     d.ref_interne,
-        date_emission:   d.date_emission
-      })
-    });
-    toast('✓ Facture archivée', 'success');
-  } catch(e) {
-    toast('⚠ Archivage Supabase échoué', 'error');
-  }
-
-  // 3. Mail récap admin via EmailJS
-  try {
-    if (typeof emailjs !== 'undefined') {
-      await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-        liste: `NOUVELLE FACTURE\n\n` +
-               `N° : ${d.numero}\n` +
-               `Date : ${formatDate(d.date_emission)}\n` +
-               `Membre : ${d.prenom} ${d.nom}\n` +
-               `Mail : ${d.mail}\n` +
-               `Prestation : ${typeLabels[d.type]}\n` +
-               `Description : ${d.description}\n` +
-               `Montant : ${d.montant.toLocaleString('fr-FR', {minimumFractionDigits:2})} €\n` +
-               `Paiement : ${paiementLabels[d.paiement]}\n` +
-               (d.ref_interne ? `Réf. : ${d.ref_interne}` : '')
+    const dateStr = new Date().toISOString().split('T')[0].replace(/-/g, '');
+    for (let tentative = 0; tentative < 6; tentative++) {
+      const resp = await fetch(`${SUPABASE_URL}/rest/v1/factures`, {
+        method: 'POST',
+        headers: { ...supaHeaders(), 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+        body: JSON.stringify({
+          numero:      numeroFinal,
+          type:        d.type || 'invite',
+          membre_nom:  d.prenom + ' ' + d.nom,
+          montant:     d.montant,
+          statut:      'paye',
+          description: d.description
+        })
       });
-      toast('✓ Mail récap envoyé', 'success');
+      if (resp.ok) { enregistre = true; break; }
+      if (resp.status === 409) {
+        // numéro déjà pris → recalculer le suivant et réessayer
+        const r = await fetch(`${SUPABASE_URL}/rest/v1/factures?numero=like.${dateStr}*&select=numero&order=numero.desc&limit=1`, { headers: supaHeaders() });
+        const data = await r.json();
+        let seq = 1;
+        if (data && data.length > 0) { const p = data[0].numero.split('-'); if (p.length === 2) seq = parseInt(p[1]) + 1; }
+        numeroFinal = `${dateStr}-${String(seq).padStart(3, '0')}`;
+        continue;
+      }
+      break; // autre erreur → on sort
+    }
+    if (enregistre) {
+      d.numero = numeroFinal;  // pour le mail / PDF qui suivent
+      document.getElementById('display-numero').textContent = numeroFinal;
+      toast('✓ Facture enregistree', 'success');
+    } else {
+      toast('⚠ Archivage Supabase echoue', 'error');
     }
   } catch(e) {
-    console.warn('EmailJS:', e);
+    toast('⚠ Archivage Supabase echoue', 'error');
   }
 
-  // 4. Reset formulaire + nouveau numéro
+  // 2. Mail membre avec la facture
+  try {
+    const resp = await fetch("https://api.emailjs.com/api/v1.0/email/send", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        service_id: EJS_SVC,
+        template_id: "template_ic5fplw",
+        user_id: EJS_PUB,
+        template_params: {
+          to_email:       d.mail,
+          prenom:         d.prenom,
+          nom:            d.nom,
+          adresse:        d.adresse || '',
+          titre:          typeLabels[d.type] || 'Facture',
+          contenu:        "Votre facture a ete enregistree par le Club 100 Reims.",
+          description:    d.description,
+          numero_facture: d.numero,
+          date_facture:   new Date().toLocaleDateString('fr-FR'),
+          montant:        d.montant.toLocaleString('fr-FR', {minimumFractionDigits:2}),
+          mode_paiement:  paiementLabels[d.paiement] || d.paiement
+        }
+      })
+    });
+    const corps = await resp.text();
+    console.log('EmailJS status:', resp.status, '| reponse:', corps, '| to_email:', d.mail);
+    if (resp.ok) {
+      toast('✓ Mail envoye au membre', 'success');
+    } else {
+      toast('⚠ EmailJS a refuse : ' + resp.status + ' ' + corps, 'error');
+    }
+  } catch(e) {
+    console.error('Mail membre (erreur reseau):', e);
+    toast('⚠ Erreur reseau envoi mail', 'error');
+  }
+
+  // 3. Reset formulaire + nouveau numero
   resetForm();
   await chargerProchainNumero();
 }

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin:0;padding:0;background:#f0f0f0;font-family:Arial,Helvetica,sans-serif;">
+
+<div style="max-width:680px;margin:32px auto;background:#ffffff;padding:48px 52px;box-shadow:0 2px 20px rgba(0,0,0,0.10);">
+
+  <!-- EN-TÊTE : émetteur + titre facture -->
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:32px;padding-bottom:20px;border-bottom:2px solid #C9A84C;">
+
+    <!-- ÉMETTEUR -->
+    <div>
+      <div style="font-size:17px;font-weight:700;color:#C9A84C;margin-bottom:6px;letter-spacing:0.03em;">Club 100 Reims</div>
+      <div style="font-size:12px;color:#555;line-height:1.8;">
+        C3 Allée Alberto Santos Dumont<br>
+        51100 Reims<br>
+        RNA : W513008995<br>
+        club100reims@gmail.com
+      </div>
+    </div>
+
+    <!-- TITRE FACTURE -->
+    <div style="text-align:right;">
+      <div style="font-size:24px;font-weight:700;color:#1a1a1a;letter-spacing:0.05em;text-transform:uppercase;margin-bottom:8px;">FACTURE</div>
+      <div style="font-size:13px;color:#C9A84C;font-weight:700;margin-bottom:4px;">N° {{numero_facture}}</div>
+      <div style="font-size:12px;color:#777;">Date : {{date_facture}}</div>
+    </div>
+
+  </div>
+
+  <!-- DESTINATAIRE -->
+  <div style="margin-bottom:32px;">
+    <div style="font-size:10px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:#999;margin-bottom:8px;">Destinataire</div>
+    <div style="font-size:14px;font-weight:700;color:#1a1a1a;">{{prenom}} {{nom}}</div>
+    <div style="font-size:12px;color:#555;line-height:1.8;margin-top:2px;">
+      {{adresse}}<br>
+      {{to_email}}
+    </div>
+  </div>
+
+  <!-- OBJET -->
+  <div style="font-size:13px;color:#1a1a1a;margin-bottom:20px;">
+    {{contenu}}
+  </div>
+
+  <!-- TABLEAU PRESTATION -->
+  <table style="width:100%;border-collapse:collapse;margin-bottom:24px;">
+    <thead>
+      <tr style="background:#f5f5f5;">
+        <th style="padding:10px 12px;text-align:left;font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#777;border-bottom:1px solid #ddd;width:55%;">Désignation</th>
+        <th style="padding:10px 12px;text-align:center;font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#777;border-bottom:1px solid #ddd;width:10%;">Qté</th>
+        <th style="padding:10px 12px;text-align:right;font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#777;border-bottom:1px solid #ddd;width:35%;">Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="padding:14px 12px;font-size:13px;color:#1a1a1a;border-bottom:1px solid #eee;">
+          <strong>{{titre}}</strong><br>
+          <span style="font-size:12px;color:#777;">{{description}}</span>
+        </td>
+        <td style="padding:14px 12px;font-size:13px;color:#1a1a1a;border-bottom:1px solid #eee;text-align:center;">1</td>
+        <td style="padding:14px 12px;font-size:13px;color:#1a1a1a;border-bottom:1px solid #eee;text-align:right;">{{montant}} €</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- TOTAL -->
+  <div style="display:flex;justify-content:flex-end;margin-bottom:28px;">
+    <table style="width:260px;">
+      <tr>
+        <td style="padding:6px 0;font-size:13px;color:#555;border-bottom:1px solid #eee;">Sous-total HT</td>
+        <td style="padding:6px 0;font-size:13px;color:#555;border-bottom:1px solid #eee;text-align:right;">{{montant}} €</td>
+      </tr>
+      <tr>
+        <td style="padding:6px 0;font-size:13px;color:#555;border-bottom:1px solid #eee;">TVA</td>
+        <td style="padding:6px 0;font-size:13px;color:#555;border-bottom:1px solid #eee;text-align:right;">Non applicable</td>
+      </tr>
+      <tr>
+        <td style="padding:10px 0 6px;font-size:15px;font-weight:700;color:#1a1a1a;border-top:2px solid #C9A84C;">Total à régler</td>
+        <td style="padding:10px 0 6px;font-size:15px;font-weight:700;color:#C9A84C;border-top:2px solid #C9A84C;text-align:right;">{{montant}} €</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- PAIEMENT -->
+  <div style="background:#fafafa;border:1px solid #eee;border-radius:6px;padding:14px 16px;margin-bottom:28px;font-size:12px;color:#555;line-height:1.9;">
+    <strong style="color:#1a1a1a;">Règlement :</strong> {{mode_paiement}}<br>
+    <strong style="color:#1a1a1a;">IBAN :</strong> FR76 1020 6000 0198 7559 9124 403<br>
+    <strong style="color:#1a1a1a;">Référence virement :</strong> {{numero_facture}}
+  </div>
+
+  <!-- PIED -->
+  <div style="border-top:1px solid #eee;padding-top:16px;font-size:11px;color:#aaa;line-height:1.8;text-align:center;">
+    Club 100 Reims — Association loi 1901 à but non lucratif<br>
+    C3 Allée Alberto Santos Dumont, 51100 Reims — Président : Pierre Bernardin<br>
+    TVA non applicable, art. 293 B du CGI — RNA : W513008995
+  </div>
+
+</div>
+</body>
+</html>
